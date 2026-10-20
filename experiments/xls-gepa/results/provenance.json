@@ -1,0 +1,13 @@
+{
+  "hlsfactory_commit": "2aba8756de8e2fab1d1095b2483cfa695bf3be10",
+  "source_url": "https://raw.githubusercontent.com/sharc-lab/HLSFactory/2aba8756de8e2fab1d1095b2483cfa695bf3be10/hlsfactory/hls_dataset_sources/xls_upstream/idct_chen/idct_chen.x",
+  "files_sha256": {
+    "PROVENANCE.json": "692366336f7500c46659bc471e760c828658deb36d897d4f5068163355f70a73",
+    "hlsfactory.toml": "0050b3cd0179735da42bf68d3d3073126723a41fc3c75d321056732157f42309",
+    "idct_chen.x": "1166b8a58483a166550de600e1d910c3b12c253682ba0fc5156ae17e637cbced"
+  },
+  "xls_commit": "0a7c502ccaaa650cb2da1929c536c4ab100eafda",
+  "xls_substantive_diff": "",
+  "test_count": 5,
+  "line_ending_fix": "xls/dslx/frontend/BUILD: CRLF to LF"
+}
