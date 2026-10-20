@@ -5,7 +5,7 @@ import tarfile
 from pathlib import Path
 from setup import fetch, ROOT
 
-commit = json.loads(fetch('https://api.github.com/repos/gepa-ai/gepa/commits/main'))['sha']
+commit = json.loads((ROOT/'results/gepa-version.json').read_text())['commit']
 data = fetch(f'https://api.github.com/repos/gepa-ai/gepa/tarball/{commit}')
 destination = ROOT / 'vendor/gepa'
 destination.mkdir(parents=True, exist_ok=True)
