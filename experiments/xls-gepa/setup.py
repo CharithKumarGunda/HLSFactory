@@ -7,6 +7,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parent
 XLS = Path('/home/xls-developer/xls')
+HLSFACTORY_COMMIT = '2aba8756de8e2fab1d1095b2483cfa695bf3be10'
 
 def fetch(url):
     req = urllib.request.Request(url, headers={'User-Agent': 'xls-gepa-research'})
@@ -15,7 +16,7 @@ def fetch(url):
 def main():
     for name in ('reference', 'logs', 'results', 'configs', 'vendor', 'candidates'):
         (ROOT / name).mkdir(exist_ok=True)
-    commit = json.loads(fetch('https://api.github.com/repos/sharc-lab/HLSFactory/commits/main'))['sha']
+    commit = HLSFACTORY_COMMIT
     base = f'https://raw.githubusercontent.com/sharc-lab/HLSFactory/{commit}/hlsfactory/hls_dataset_sources/xls_upstream/idct_chen/'
     listing = json.loads(fetch(f'https://api.github.com/repos/sharc-lab/HLSFactory/contents/hlsfactory/hls_dataset_sources/xls_upstream/idct_chen?ref={commit}'))
     files = {}
