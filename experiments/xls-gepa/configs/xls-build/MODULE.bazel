@@ -1,0 +1,318 @@
+module(
+    name = "xls",
+    repo_name = "com_google_xls",
+)
+
+# Compiler toolchain
+bazel_dep(name = "llvm", version = "0.8.18", dev_dependency = True)
+
+register_toolchains("@llvm//toolchain:all")
+
+# Python toolchain
+bazel_dep(name = "rules_python", version = "1.9.0")
+
+PYTHON_VERSION = "3.14"
+
+PYTHON_VERSION_NAME = PYTHON_VERSION.replace(".", "_")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    python_version = PYTHON_VERSION,
+)
+
+# Use repo mapping to ensure that BUILD files don't need to be updated when the Python version
+# changes to a different version.
+use_repo(
+    python,
+    project_python = "python_{}".format(PYTHON_VERSION_NAME),
+    project_python_host = "python_{}_host".format(PYTHON_VERSION_NAME),
+)
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    timeout = 600000,
+    hub_name = "xls_pip_deps",
+    python_version = PYTHON_VERSION,
+    requirements_lock = "//dependency_support:pip_requirements_lock.txt",
+)
+use_repo(pip, "xls_pip_deps")
+
+# Root module dependencies.
+# Note: some older dependencies still require repo_name aliases; see #4459
+bazel_dep(name = "abseil-cpp", version = "20260526.0")
+bazel_dep(name = "abseil-py", version = "2.1.0")
+bazel_dep(name = "bazel_features", version = "1.41.0")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "boringssl", version = "0.20250114.0")
+bazel_dep(name = "cppitertools", version = "2.2")
+
+# TODO: https://github.com/grpc/grpc/issues/41995 - Update to recent version once incompatibility
+# with envoy_api (transitive bazel_dep through gRPC) is fixed.
+# This is pinned to the previous version requested by gRPC (and also the latest version that works).
+bazel_dep(name = "googleapis", version = "0.0.0-20240819-fe8ba054a")
+single_version_override(
+    module_name = "googleapis",
+    version = "0.0.0-20240819-fe8ba054a",
+)
+
+bazel_dep(name = "grpc", version = "1.80.0")
+
+# TODO: https://github.com/grpc/grpc/issues/41998 - remove once this is fixed in the grpc repo.
+single_version_override(
+    module_name = "grpc",
+    patch_strip = 1,
+    patches = ["//dependency_support/grpc:typing_extensions.patch"],
+)
+
+bazel_dep(name = "linenoise", version = "2.0.0.bcr.1")
+bazel_dep(name = "nlohmann_json", version = "3.12.0.bcr.1")
+bazel_dep(name = "or-tools", version = "9.15")
+
+# TODO: mikex - Remove this override once the next version of or-tools lands on BCR with
+# https://github.com/google/or-tools/commit/aa4d0bf2dcbd30e2af2f54dfa7ce06a7f49869f8.
+single_version_override(
+    module_name = "or-tools",
+    patch_strip = 1,
+    patches = [
+        "//dependency_support/or-tools:make_pdlp_public.patch",
+        "//dependency_support/or-tools:use_absl_source_location.patch",
+    ],
+    version = "9.15",
+)
+
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "protobuf", version = "33.0")
+bazel_dep(name = "mpfr", version = "4.2.2")
+bazel_dep(name = "gmp", version = "6.3.0.bcr.1")
+bazel_dep(name = "re2", version = "2024-07-02.bcr.1")
+bazel_dep(name = "riegeli", version = "0.0.0-20250822-9f2744d")
+bazel_dep(name = "rules_cc", version = "0.2.18")
+bazel_dep(name = "rules_closure", version = "0.15.0")
+bazel_dep(name = "rules_license", version = "1.0.0")
+bazel_dep(name = "rules_proto", version = "7.1.0")
+bazel_dep(name = "rules_shell", version = "0.6.1")
+bazel_dep(name = "verible", version = "0.0.3933")
+bazel_dep(name = "with_cfg.bzl", version = "0.14.6")
+
+# LLVM project
+llvm_raw_ext = use_extension("//dependency_support/llvm:extension.bzl", "llvm_raw_ext")
+use_repo(llvm_raw_ext, "llvm-raw")
+
+llvm_configure = use_repo_rule("@llvm-raw//utils/bazel:configure.bzl", "llvm_configure")
+
+llvm_configure(
+    name = "llvm-project",
+    targets = [
+        "AArch64",
+        "X86",
+    ],
+)
+
+# Use Bzlmod (BCR) to supply zlib and zstd for LLVM
+bazel_dep(name = "zlib-ng", version = "2.3.3", repo_name = "llvm_zlib")
+bazel_dep(name = "zstd", version = "1.5.7.bcr.1", repo_name = "llvm_zstd")
+
+# pprof is not in BCR.
+pprof_ext = use_extension("//dependency_support/pprof:extension.bzl", "pprof_extension")
+use_repo(pprof_ext, "pprof")
+
+# Used by XLS[cc]
+ac_types_ext = use_extension("//dependency_support/com_github_hlslibs_ac_types:extension.bzl", "ac_types_extension")
+use_repo(ac_types_ext, "ac_datatypes")
+
+z3_ext = use_extension("//dependency_support/z3:extension.bzl", "z3_extension")
+use_repo(z3_ext, "z3")
+
+bitwuzla_ext = use_extension("//dependency_support/bitwuzla:extension.bzl", "bitwuzla_extension")
+use_repo(bitwuzla_ext, "bitwuzla", "cadical", "symfpu")
+
+# zstd is in BCR, but does not currently expose decodecorpus
+zstd_ext = use_extension("//dependency_support/com_github_facebook_zstd:extension.bzl", "zstd_extension")
+use_repo(zstd_ext, "zstd")
+
+# TODO: bazelbuild/bazel-central-registry#1020 - revisit when perfetto is in BCR.
+perfetto_ext = use_extension("//dependency_support/perfetto:extension.bzl", "perfetto_extension")
+use_repo(perfetto_ext, "perfetto")
+use_repo(perfetto_ext, "perfetto_cfg")
+
+# Perfetto requires this to get through bazel analysis, but seems unused for our use.
+bazel_dep(name = "rules_android", version = "0.6.0")
+
+# Pin this as otherwise we encounter some bazel analysis failure.
+bazel_dep(name = "rules_jvm_external", version = "6.8")
+
+# Pinning some maven versions seems necessary to make things resolve correctly.
+# As of 2025-11-07, this seems necessary. If unspecified, junit and mockito have
+# some issue with being a testonly dep of a non-test target. I (rigge@) would
+# have thought marking them both as an exclusion (like mockito below) would
+# solve this, but somehow it didn't for junit. Specifying a specific version of
+# junit seems to make things work.
+# TODO: bazelbuild/bazel-central-registry#1020 - revisit when perfetto is in BCR.
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    artifacts = ["junit:junit:4.13.2"],
+    known_contributing_modules = [
+        "bazel_worker_java",
+        "grpc-java",
+        "or-tools",
+        "rules_closure",
+        "rules_web_testing_java",
+        "xls",
+    ],
+)
+maven.artifact(
+    artifact = "closure-stylesheets",
+    exclusions = ["org.mockito:mockito-core"],
+    group = "com.google.closure-stylesheets",
+    version = "1.5.0",
+)
+
+# Used both by XLS and rules_hdl.
+bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.2")
+bazel_dep(name = "rules_pkg", version = "1.2.0")
+
+# rules_hdl deps with bzlmod support.
+bazel_dep(name = "rules_bison", version = "0.3")
+bazel_dep(name = "rules_flex", version = "0.3")
+bazel_dep(name = "rules_m4", version = "0.3")
+bazel_dep(name = "swig", version = "4.3.0")
+bazel_dep(name = "rules_hdl", version = "0.0.0")
+bazel_dep(name = "openroad", repo_name = "org_theopenroadproject")
+
+git_override(
+    module_name = "rules_hdl",
+    commit = "ece083ef1385ff9ab067711fa766d77c3b54d961",
+    remote = "https://github.com/hdl/bazel_rules_hdl.git",
+)
+
+# rules_7zip and openroad are transitive dependencies from rules_hdl.
+# Since overrides are root-honored only in Bzlmod, we must mirror these overrides in
+# our root MODULE.bazel so that Bzlmod can resolve the dependency graph.
+git_override(
+    module_name = "rules_7zip",
+    commit = "03a10b5796eac0aed122cf52064ed15785610857",
+    remote = "https://github.com/zaucy/rules_7zip.git",
+)
+
+git_override(
+    module_name = "openroad",
+    commit = "d046747ad39bfc5e032eb5c548ad8dfb441e228b",
+    init_submodules = True,
+    patch_strip = 1,
+    # Redirects OpenROAD's @slang placeholder repository path from "bazel" to "."
+    # to resolve the bzlmod dependency graph. We don't actually depend on the @slang alias.
+    patches = [
+        "//dependency_support/openroad:slang_path.patch",
+    ],
+    remote = "https://github.com/The-OpenROAD-Project/OpenROAD.git",
+)
+
+# qt-bazel is a transitive dependency from OpenROAD (used for GUI support).
+# Since overrides are root-honored only in Bzlmod, we must mirror this override in
+# our root MODULE.bazel so that Bzlmod can resolve the dependency graph.
+git_override(
+    module_name = "qt-bazel",
+    commit = "886104974c2fd72439f2c33b5deebf0fe4649df7",
+    remote = "https://github.com/The-OpenROAD-Project/qt_bazel_prebuilts",
+)
+
+# TODO: mikex - Remove this override once fixed upstream in https://registry.bazel.build/modules/sv-lang.
+# rules_pycross is a transitive dependency of OpenROAD (via sv-lang).
+# We override rules_pycross to 0.8.3 here to incorporate the fix from
+# https://github.com/jvolkman/rules_pycross/pull/221. Otherwise, the resolved version of pycross
+# (0.8.1) will run into a mismatch between the registered Python versions in
+# @python_versions//:pip.bzl and the supported versions in @rules_python//python:versions.bzl.
+single_version_override(
+    module_name = "rules_pycross",
+    version = "0.8.3",
+)
+
+rules_hdl_tools = use_extension("@rules_hdl//dependency_support:tools_extension.bzl", "tools_extension")
+use_repo(rules_hdl_tools, "at_clifford_yosys", "com_icarus_iverilog")
+
+rules_hdl_pdks = use_extension("@rules_hdl//dependency_support:pdks_extension.bzl", "pdks_extension")
+use_repo(
+    rules_hdl_pdks,
+    "com_google_skywater_pdk",
+    "com_google_skywater_pdk_sky130_fd_sc_hd",
+    "com_google_skywater_pdk_sky130_fd_sc_hdll",
+    "com_google_skywater_pdk_sky130_fd_sc_hs",
+    "com_google_skywater_pdk_sky130_fd_sc_hvl",
+    "com_google_skywater_pdk_sky130_fd_sc_lp",
+    "com_google_skywater_pdk_sky130_fd_sc_ls",
+    "com_google_skywater_pdk_sky130_fd_sc_ms",
+    "org_theopenroadproject_asap7_pdk_r1p7",
+    "org_theopenroadproject_asap7sc6t_26",
+    "org_theopenroadproject_asap7sc7p5t_27",
+    "org_theopenroadproject_asap7sc7p5t_28",
+)
+
+# TODO: https://github.com/protocolbuffers/protobuf/issues/24084 - Remove this override once fixed upstream.
+single_version_override(
+    module_name = "protobuf",
+    patch_strip = 1,
+    patches = ["//dependency_support/protobuf:fix_system_python.patch"],
+    version = "33.5",
+)
+
+# Force all Boost sub-modules to use the same ABI-compatible version (1.89.0.bcr.2).
+# This is required because sv-lang transitively requests boost.unordered 1.87.0
+# (compatibility level 108700), while OpenROAD requests 1.89.0.bcr.2 (compatibility
+# level 0). Bzlmod's Minimal Version Selection cannot automatically resolve this
+# compatibility level mismatch.
+single_version_override(
+    module_name = "boost.unordered",
+    version = "1.89.0.bcr.2",
+)
+
+single_version_override(
+    module_name = "boost.multiprecision",
+    version = "1.89.0.bcr.2",
+)
+
+single_version_override(
+    module_name = "boost.serialization",
+    version = "1.89.0.bcr.2",
+)
+
+# Dev dependencies
+bazel_dep(name = "fuzztest", version = "20260629.0", dev_dependency = True, repo_name = "com_google_fuzztest")
+bazel_dep(name = "google_benchmark", version = "1.9.5", dev_dependency = True)
+bazel_dep(name = "googletest", version = "1.17.0", dev_dependency = True)
+
+# compilation DB; build_cleaner
+bazel_dep(name = "bant", version = "0.3.6", dev_dependency = True)
+
+# Hedron's Compile Commands Extractor for Bazel
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+git_override(
+    module_name = "hedron_compile_commands",
+    # Updated 2025/08/19.
+    commit = "abb61a688167623088f8768cc9264798df6a9d10",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
+)
+
+# Documentation generator
+bazel_dep(name = "stardoc", version = "0.8.1")
+
+register_toolchains("//xls/common/toolchains:all")
+
+# Dependencies that we want past versions known to be well-behaved w/ toolchain
+bazel_dep(name = "tcl_lang", version = "9.0.2.bcr.2")
+
+single_version_override(
+    module_name = "sed",
+    version = "4.9.bcr.5",
+)
+
+single_version_override(
+    module_name = "m4",
+    version = "1.4.21.bcr.4",
+)
+
+single_version_override(
+    module_name = "gawk",
+    version = "5.3.2.bcr.7",
+)
+
