@@ -2,7 +2,7 @@
 
 ## Result
 
-A bounded, XLS-specific GEPA experiment ran on the pinned `idct_chen.x` design. The original passed its five DSLX tests, 527 deterministic differential comparisons, and the recorded XLS equivalence check. The evaluator rejected a deliberately incorrect implementation. GEPA made two calls to a local Qwen2.5-Coder 3B model at zero external cost; both proposed candidates failed DSLX validation, so the original remained the best candidate. No optimization improvement was achieved.
+A bounded, XLS-specific GEPA experiment ran on the pinned `idct_chen.x` design. The original passed its five DSLX tests. An unchanged candidate matched the original on 527 deterministic inputs and passed XLS equivalence checking against that same original. The evaluator rejected a deliberately incorrect implementation. GEPA made two calls to a local Qwen2.5-Coder 3B model at zero external cost; both proposed candidates failed DSLX validation, so the original remained the best candidate. No optimization improvement was achieved.
 
 ## How to review
 
