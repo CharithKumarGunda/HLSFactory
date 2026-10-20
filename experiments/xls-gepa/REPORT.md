@@ -1,6 +1,6 @@
 # IDCT XLS + GEPA research report
 
-Only DSLX implementation source is optimized. Scheduling/codegen remain fixed at a one-stage pipeline with unit delay model and registered input/output. No Vitis or HLS-Eval work was performed.
+The search was configured to rewrite only DSLX implementation source. Scheduling/codegen remained fixed at a one-stage pipeline with unit delay model and registered input/output. This prototype did not include Vitis or HLS-Eval integration.
 
 ## Evidence completed
 
@@ -34,7 +34,7 @@ Only DSLX implementation source is optimized. Scheduling/codegen remain fixed at
 }
 ```
 
-Correctness: tested_equivalent. Formal result: proven_equivalent.
+The unchanged implementation passed the 527 comparisons and XLS equivalence check against the pinned original. This check confirms the evaluator's handling of unchanged source; it is not an independent proof that the original IDCT implements a separate mathematical specification.
 
 ## Evaluator verification
 
