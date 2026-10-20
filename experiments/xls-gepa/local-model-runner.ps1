@@ -1,6 +1,7 @@
 $ErrorActionPreference = 'Continue'
-$dockerExe = 'C:\Users\rajes\AppData\Local\Programs\DockerDesktop\resources\bin\docker.exe'
-$logDir = 'C:\Users\rajes\Documents\Codex\xls-gepa\logs'
+$dockerExe = (Get-Command docker.exe -ErrorAction Stop).Source
+$projectDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$logDir = Join-Path $projectDir 'logs'
 $logPath = Join-Path $logDir 'local-gepa-run.log'
 $exitPath = Join-Path $logDir 'local-gepa-run.exit'
 
