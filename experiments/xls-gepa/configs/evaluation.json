@@ -1,0 +1,20 @@
+{
+  "top": "idct",
+  "module_name": "idct_chen",
+  "generator": "pipeline",
+  "pipeline_stages": 1,
+  "delay_model": "unit",
+  "secondary_delay_model": "asap7",
+  "flop_inputs": true,
+  "flop_outputs": true,
+  "use_system_verilog": true,
+  "opt_level": 3,
+  "random_seed": 20260930,
+  "random_cases_per_distribution": 128,
+  "command_timeout_seconds": 180,
+  "formal_timeout_seconds": 60,
+  "objective": "minimize optimized IR unit-model combinational critical path",
+  "score": "valid: 1/(1+critical_path_unit_delay); invalid: 0",
+  "correctness_policy": "five protected unit tests and all deterministic differential cases required; formal counterexamples reject; formal timeout inconclusive"
+}
+
