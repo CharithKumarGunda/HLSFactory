@@ -1,0 +1,15 @@
+{
+  "authorized": true,
+  "provider": "ollama",
+  "model": "qwen2.5-coder:3b",
+  "api_base": "http://host.docker.internal:11434",
+  "local_zero_cost": true,
+  "spending_limit_usd": 0,
+  "input_usd_per_million": 0,
+  "output_usd_per_million": 0,
+  "max_output_tokens": 6000,
+  "max_model_calls": 2,
+  "request_timeout_seconds": 900,
+  "note": "User authorized a no-cost local open-source model. No API key or paid API is used."
+}
+
