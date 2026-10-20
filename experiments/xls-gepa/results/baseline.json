@@ -1,0 +1,77 @@
+{
+  "candidate_id": "baseline-97ec82ce92ca",
+  "source_sha256": "97ec82ce92ca589e284833b050f917b8cdc5c0fe77e93cd2a1336aa9aad3a603",
+  "configuration_sha256": "411fcb43b4f9878739b7fefd1e6671ceac04853b884a28b0dd690230182284ef",
+  "correctness_status": "tested_equivalent",
+  "formal_status": "proven_equivalent",
+  "metrics": {
+    "critical_path_unit_delay": 40,
+    "optimized_ir_node_count": 1883,
+    "optimized_ir_operation_counts": {
+      "add": 296,
+      "array": 1,
+      "array_index": 64,
+      "bit_slice": 592,
+      "concat": 184,
+      "literal": 82,
+      "sign_ext": 264,
+      "sub": 224,
+      "umul": 176
+    },
+    "asap7_critical_path_estimate_ps": 8488,
+    "block_register_bits": 4096,
+    "block_reg_to_reg_unit_delay": 40,
+    "block_input_to_reg_unit_delay": 0,
+    "block_reg_to_output_unit_delay": 0
+  },
+  "score": 0.024390243902439025,
+  "version": {
+    "config": {
+      "top": "idct",
+      "module_name": "idct_chen",
+      "generator": "pipeline",
+      "pipeline_stages": 1,
+      "delay_model": "unit",
+      "secondary_delay_model": "asap7",
+      "flop_inputs": true,
+      "flop_outputs": true,
+      "use_system_verilog": true,
+      "opt_level": 3,
+      "random_seed": 20260930,
+      "random_cases_per_distribution": 128,
+      "command_timeout_seconds": 180,
+      "formal_timeout_seconds": 60,
+      "objective": "minimize optimized IR unit-model combinational critical path",
+      "score": "valid: 1/(1+critical_path_unit_delay); invalid: 0",
+      "correctness_policy": "five protected unit tests and all deterministic differential cases required; formal counterexamples reject; formal timeout inconclusive"
+    },
+    "versions": {
+      "hlsfactory_commit": "2aba8756de8e2fab1d1095b2483cfa695bf3be10",
+      "source_url": "https://raw.githubusercontent.com/sharc-lab/HLSFactory/2aba8756de8e2fab1d1095b2483cfa695bf3be10/hlsfactory/hls_dataset_sources/xls_upstream/idct_chen/idct_chen.x",
+      "files_sha256": {
+        "PROVENANCE.json": "692366336f7500c46659bc471e760c828658deb36d897d4f5068163355f70a73",
+        "hlsfactory.toml": "0050b3cd0179735da42bf68d3d3073126723a41fc3c75d321056732157f42309",
+        "idct_chen.x": "1166b8a58483a166550de600e1d910c3b12c253682ba0fc5156ae17e637cbced"
+      },
+      "xls_commit": "0a7c502ccaaa650cb2da1929c536c4ab100eafda",
+      "xls_substantive_diff": "",
+      "test_count": 5,
+      "line_ending_fix": "xls/dslx/frontend/BUILD: CRLF to LF"
+    },
+    "tools_sha256": {
+      "interpreter": "c5e60c3ebd9c09ada16e24d5a10013083ca616dd25bf1249034fc01a2a08e6ae",
+      "convert": "588e6a18473a4e4c17053538bd4f53e8a082146fa5f8976c6054a87778c4afec",
+      "opt": "974882f0c051a4cba1cebaafa0f6f1a10d2df1bfba4f2474b816023838d325e5",
+      "codegen": "e84b8e7e95b3b71ec049a6da7d1a0e8ba4d2f40bdb90af0fd84620025e3c6ba9",
+      "eval": "6e9c0f73076c4f1b9f3f0af26eafc2ed49d4afd914e0a53c6a29339d32dbffce",
+      "delay": "d3197005cf5d94f08e71b1f927686afb4b1c481cfb1182c4df0c41876a5e5a50",
+      "formal": "68a6d5fa266fe5a3f24f41acb6c90e0bcc3b6ee462144ca3f158ab69524568f3"
+    },
+    "evaluator_sha256": "fde9b5fb5022ca411e5be799fbc62708fad94c53e69b9c1d680ba78d2f74dfec"
+  },
+  "artifact_directory": "/workspace/results/baseline-411fcb43b4f98787",
+  "is_baseline": true,
+  "test_cases": 527,
+  "feedback": "Passed five protected tests and 527 edge/random cases. Formal: proven_equivalent. Unit-model critical path: 40. IR operation counts: {'literal': 82, 'array_index': 64, 'add': 296, 'bit_slice': 592, 'umul': 176, 'concat': 184, 'sub': 224, 'sign_ext': 264, 'array': 1}. Lower critical path is the fixed objective; preserve full s32 overflow, signed shifts, and rounding.",
+  "elapsed_seconds": 2.5254237089993694
+}
