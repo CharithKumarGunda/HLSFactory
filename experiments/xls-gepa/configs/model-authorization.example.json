@@ -1,0 +1,11 @@
+{
+  "authorized": false,
+  "model": "PROVIDER/MODEL_REQUIRES_USER_AUTHORIZATION",
+  "spending_limit_usd": 0,
+  "input_usd_per_million": null,
+  "output_usd_per_million": null,
+  "max_output_tokens": 10000,
+  "max_model_calls": 3,
+  "note": "Populate only after user explicitly authorizes provider/model and maximum spend. Credentials must remain in environment or credential storage. Verify provider pricing before setting rates."
+}
+
