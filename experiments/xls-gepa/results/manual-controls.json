@@ -1,0 +1,31 @@
+{
+  "kind": "manual_positive_controls",
+  "fixed_configuration_sha256": "411fcb43b4f9878739b7fefd1e6671ceac04853b884a28b0dd690230182284ef",
+  "controls": [
+    {
+      "id": "manual-distribute-w1w7-row-v1",
+      "source": "candidates/manual_distribute_w1w7_row.x",
+      "source_sha256": "c864bd45dfced6c31377af91f4843d3b15ceb49438abd6720ed6a13bdf74a0ac",
+      "result": "results/evaluations/c864bd45dfced6c31377af91f4843d3b15ceb49438abd6720ed6a13bdf74a0ac-411fcb43b4f98787/result.json",
+      "status": "rejected",
+      "failure": "DSLX rejected two unused local constants, w1pw7 and w1mw7; see result.json for exact compiler output"
+    },
+    {
+      "id": "manual-distribute-w1w7-row-v2",
+      "source": "candidates/manual_distribute_w1w7_row_v2.x",
+      "source_sha256": "a7cf773fa9498b0ce50120b9a175e903372cca7333351ba6cdd565d9b01683bc",
+      "result": "results/evaluations/a7cf773fa9498b0ce50120b9a175e903372cca7333351ba6cdd565d9b01683bc-411fcb43b4f98787/result.json",
+      "status": "tested_equivalent",
+      "formal_status": "proven_equivalent",
+      "five_protected_tests_passed": true,
+      "differential_cases_passed": 527,
+      "metrics": {
+        "critical_path_unit_delay": 40,
+        "asap7_critical_path_estimate_ps": 8424,
+        "optimized_ir_node_count": 1820,
+        "block_register_bits": 4096
+      },
+      "score": 0.024390243902439025
+    }
+  ]
+}
