@@ -6,6 +6,8 @@ This experiment rewrites DSLX implementation source only. XLS scheduling and cod
 
 The XLS tools, evaluator, and bounded local GEPA experiment are complete. See `STEFAN_REVIEW_GUIDE.md` for the review path, `REPORT.md` for results, and `PROJECT_STATUS.md` for exact versions and next steps. Two GEPA candidates failed DSLX validation, so no optimization improvement was achieved.
 
+Reviewers can check that the published source, configuration, validation record, comparison table, and GEPA summary agree by running `node verify_review.mjs`. This checks saved artifacts and requires no Docker or model. It does not rerun XLS.
+
 ## Environment
 
 The original run used Docker Desktop on Windows. The project folder was mounted at `/workspace` in a persistent container named `xls-gepa-work`. Its local image was `xls-build-docker:latest`; the XLS checkout was at `/home/xls-developer/xls` inside the container. That image and the compiled XLS binaries are not included in this review branch.
