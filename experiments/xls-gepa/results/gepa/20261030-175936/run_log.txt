@@ -1,0 +1,101 @@
+Iteration 0: Base program full valset score: 0.024390243902439025 over 1 / 1 examples
+Iteration 1: Selected program 0 score: 0.024390243902439025
+Iteration 1: Proposed new text for dslx: const W1 = s32:2841;    // 2048*sqrt(2)*cos(1*pi/16)
+const W2 = s32:2676;    // 2048*sqrt(2)*cos(2*pi/16)
+const W3 = s32:2408;    // 2048*sqrt(2)*cos(3*pi/16)
+const W5 = s32:1609;    // 2048*sqrt(2)*cos(5*pi/16)
+const W6 = s32:1108;    // 2048*sqrt(2)*cos(6*pi/16)
+const W7 = s32:565;     // 2048*sqrt(2)*cos(7*pi/16)
+const R2 = s32:8192;     // 2^14
+
+// Prescale.
+let y0 = (s[u8:0] << u32:8) + s32:4096;
+let y1 = s[u8:4] << u32:8;
+let y2 = s[u8:6];
+let y3 = s[u8:2];
+let y4 = s[u8:1];
+let y5 = s[u8:7];
+let y6 = s[u8:5];
+let y7 = s[u8:3];
+
+// Stage 1.
+let y8 = W7 * (y4 + y5) + s32:4;
+let y4 = (y8 + w1mw7 * y4) >> u32:3;
+let y5 = (y8 - w1pw7 * y5) >> u32:3;
+let y8 = W3 * (y6 + y7) + s32:4;
+let y6 = (y8 - w3mw5 * y6) >> u32:3;
+let y7 = (y8 - w3pw5 * y7) >> u32:3;
+
+// Stage 2.
+let y8 = y0 + y1;
+let y0 = y0 - y1;
+let y1 = W6 * (y3 + y2) + s32:4;
+let y2 = (y1 - w2pw6 * y2) >> u32:3;
+let y3 = (y1 + w2mw6 * y3) >> u32:3;
+let y1 = y4 + y6;
+let y4 = y4 - y6;
+let y6 = y5 + y7;
+let y5 = y5 - y7;
+
+// Stage 3.
+let y7 = y8 + y3;
+let y8 = y8 - y3;
+let y3 = y0 + y2;
+let y0 = y0 - y2;
+let y2 = (R2 * (y4 + y5) + s32:128) >> u32:8;
+let y4 = (R2 * (y4 - y5) + s32:128) >> u32:8;
+
+// Stage 4.
+s32[8]:[
+    (y7 + y1) >> u32:14,
+    (y3 + y2) >> u32:14,
+    (y0 + y4) >> u32:14,
+    (y8 + y6) >> u32:14,
+    (y8 - y6) >> u32:14,
+    (y0 - y4) >> u32:14,
+    (y3 - y2) >> u32:14,
+    (y7 - y1) >> u32:14,
+]
+Iteration 1: New subsample score 0.0 is not better than old score 0.024390243902439025, skipping
+Iteration 2: Selected program 0 score: 0.024390243902439025
+Batched reflection failed (timed out); retrying per task.
+Traceback (most recent call last):
+  File "/workspace/vendor/gepa/src/gepa/proposer/reflective_mutation/reflective_mutation.py", line 259, in _propose_texts_batch_safe
+    return list(self._propose_texts_batch(jobs, mds))
+  File "/workspace/vendor/gepa/src/gepa/proposer/reflective_mutation/reflective_mutation.py", line 224, in _propose_texts_batch
+    return [self.propose_new_texts(*jobs[0], metadata=mds[0])]
+  File "/workspace/vendor/gepa/src/gepa/proposer/reflective_mutation/reflective_mutation.py", line 188, in propose_new_texts
+    proposal, next_lm = self._reflection_lm.reflect(candidate, reflective_dataset, components_to_update)
+  File "/workspace/vendor/gepa/src/gepa/proposer/reflective_mutation/reflection_lm.py", line 166, in reflect
+    return self.reflect_many([(candidate, reflective_dataset, components_to_update)])[0]
+  File "/workspace/vendor/gepa/src/gepa/proposer/reflective_mutation/reflection_lm.py", line 182, in reflect_many
+    raw_outputs = self._batch_complete([r[2] for r in rendered], [r[3] for r in rendered])
+  File "/workspace/vendor/gepa/src/gepa/proposer/reflective_mutation/reflection_lm.py", line 153, in _batch_complete
+    return [self.lm(prompts[0])]
+  File "/workspace/run_gepa.py", line 81, in __call__
+    with urllib.request.urlopen(request, timeout=self.config.get('request_timeout_seconds', 900)) as response:
+  File "/usr/lib/python3.10/urllib/request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "/usr/lib/python3.10/urllib/request.py", line 519, in open
+    response = self._open(req, data)
+  File "/usr/lib/python3.10/urllib/request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "/usr/lib/python3.10/urllib/request.py", line 496, in _call_chain
+    result = func(*args)
+  File "/usr/lib/python3.10/urllib/request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "/usr/lib/python3.10/urllib/request.py", line 1352, in do_open
+    r = h.getresponse()
+  File "/usr/lib/python3.10/http/client.py", line 1404, in getresponse
+    response.begin()
+  File "/usr/lib/python3.10/http/client.py", line 323, in begin
+    version, status, reason = self._read_status()
+  File "/usr/lib/python3.10/http/client.py", line 284, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/usr/lib/python3.10/socket.py", line 705, in readinto
+    return self._sock.recv_into(b)
+TimeoutError: timed out
+
+Per-task reflection failed: Model call refused: conservative approved budget/call limit exhausted
+Iteration 2: Reflective mutation did not propose a new candidate
+
