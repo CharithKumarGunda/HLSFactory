@@ -15,24 +15,27 @@ import gepa
 from gepa.core.adapter import EvaluationBatch
 from gepa.utils.stop_condition import TimeoutStopCondition
 
-PROMPT = '''You are optimizing the DSLX implementation of an 8x8 fixed-point IDCT for XLS.
-The ONLY editable artifact is this DSLX implementation:
+PROMPT = '''You are editing an XLS DSLX source file for an 8x8 fixed-point IDCT.
+Copy the supplied source faithfully and change only a small expression inside fn idct_row.
+Return the COMPLETE source in one ```dslx fenced code block, with no prose.
+This language is DSLX, not Rust or C. Preserve its syntax exactly: `const W1 = s32:2841;`,
+`fn idct_row(s: s32[8]) -> s32[8]`, immutable `let` bindings, and typed shifts.
+Never write `let mut`, pointer/reference arguments, `const W1: s32`, or `for i in`.
+Keep every constant value, function name, signature, test-visible helper, index, shift,
+and rounding constant. Do not add tests, imports, procs, or attributes. Remove a local
+binding if your rewrite makes it unused; DSLX rejects unused bindings.
+Arithmetic is signed s32 with modular overflow and arithmetic right shifts. Preserve
+exact behavior for all input bit patterns. If unsure, return the source unchanged.
+The fixed objective is the optimized XLS IR unit-model critical path; only validated
+candidates receive a positive score. Do not claim an improvement in your response.
+
+Candidate implementation source:
 ```dslx
 <curr_param>
 ```
-Evaluation feedback:
+
+XLS feedback:
 <side_info>
-Rewrite the entire DSLX implementation and return it in exactly one fenced dslx code block.
-Keep pub fn idct(f: s32[COEFF_PER_MCU]) -> s32[COEFF_PER_MCU], with COEFF_PER_MCU=64.
-Preserve helper signatures used by protected tests. No tests, imports, procs, or attributes.
-Preserve exact 32-bit signed arithmetic including modular overflow, arithmetic shifts,
-rounding constants, and all input bit patterns. Mathematical real-valued equivalence is insufficient.
-Scheduling, codegen, optimizer, unit delay model, correctness corpus, and scoring are fixed.
-Minimize the optimized XLS IR unit-model critical path. Score is 1/(1+critical path).
-Compiler errors or correctness mismatches score zero. Formal counterexamples reject.
-Formal timeout is inconclusive; a tested candidate is not automatically formally proven.
-Consider reducing dependency depth, constant multiplication structure, or redundant operations.
-Do not change evaluators, settings, expected values, or scoring. Do not invent metric improvements.
 '''
 
 class XLSAdapter:
