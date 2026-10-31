@@ -344,3 +344,4 @@ fn idct3_test() {
   ];
   assert_eq(want, idct(input))
 }
+
