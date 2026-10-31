@@ -1,6 +1,14 @@
 # XLS + GEPA IDCT experiment
 
-## Status: completed
+## Status: 2026-10-30 follow-up complete
+
+- Cached XLS baseline rerun passed five original tests, 527 differential cases, and equivalence checking. Estimates matched the prior baseline exactly: unit delay 40, ASAP7 estimate 8488 ps, 1883 optimized IR nodes, and 4096 register bits.
+- Manual rewrite v1 (`candidates/manual_distribute_w1w7_row.x`) was rejected for unused DSLX bindings `w1pw7` and `w1mw7`; exact compiler error is preserved in its `result.json`.
+- Manual rewrite v2 (`candidates/manual_distribute_w1w7_row_v2.x`) passed five protected tests, 527 comparisons, and XLS equivalence against the pinned original. Its unit delay remained 40 (score unchanged), ASAP7 estimate was 8424 ps, IR nodes 1820, and register bits 4096.
+- The bounded local GEPA retry with a stricter DSLX prompt completed in `results/gepa/20261030-175936/`: two model requests, $0 external spend. One proposed candidate failed DSLX validation; the second request timed out and produced no candidate. No fixed-objective improvement was achieved.
+- The existing review branch is `CharithKumarGunda/HLSFactory:review/xls-gepa-idct`. This folder has no `.git` metadata; the connected GitHub account can update that branch directly after final verification.
+
+## Prior completed experiment
 
 - Persistent containers: `xls-gepa-work` and `xls-gepa-ollama`; caches and mounted workspace preserved.
 - XLS tools built successfully from commit `0a7c502ccaaa650cb2da1929c536c4ab100eafda`.
