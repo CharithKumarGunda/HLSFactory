@@ -4,9 +4,9 @@ This experiment rewrites DSLX implementation source only. XLS scheduling and cod
 
 ## Current state
 
-The XLS tools, evaluator, and bounded local GEPA experiment are complete. See `STEFAN_REVIEW_GUIDE.md` for the review path, `REPORT.md` for results, and `PROJECT_STATUS.md` for exact versions and next steps. Two GEPA candidates failed DSLX validation, so no optimization improvement was achieved.
+The XLS tools, evaluator, and original bounded local GEPA experiment are complete. On 2026-10-30 a separate manual positive control passed five protected tests, 527 differential inputs, and XLS equivalence checking. It kept the fixed unit-model objective at delay 40 while reducing the secondary ASAP7 estimate from 8488 to 8424 ps and optimized IR nodes from 1883 to 1820. See `STEFAN_REVIEW_GUIDE.md` for the review path, `REPORT.md` for outcomes, and `PROJECT_STATUS.md` for exact versions and next steps.
 
-Reviewers can check that the published source, configuration, validation record, comparison table, and GEPA summary agree by running `node verify_review.mjs`. This checks saved artifacts and requires no Docker or model. It does not rerun XLS.
+Reviewers can check that the published source, configuration, validation record, manual controls, comparison table, and GEPA summaries agree by running `node verify_review.mjs`. This checks saved artifacts and requires no Docker or model. It does not rerun XLS.
 
 ## Environment
 
@@ -47,7 +47,7 @@ The fixed build command is in `logs/build-command.json` and `build_tools.py`. Bu
 
 ## Fixed evaluation
 
-`configs/evaluation.json` controls the single experiment. Baseline and all candidates use pipeline generator, one stage, `unit` delay model, registered inputs and outputs, SystemVerilog, and optimization level 3. Remaining defaults are held fixed by pinned XLS tools. The original run saved invocation and output files locally; this review branch contains the selected summary and validation artifacts.
+`configs/evaluation.json` controls the single experiment. Baseline and all candidates use pipeline generator, one stage, `unit` delay model, registered inputs and outputs, SystemVerilog, and optimization level 3. Remaining defaults are held fixed by pinned XLS tools. The original run saved invocation and output files locally; this review branch contains selected summaries and validation artifacts. The 2026-10-30 manual controls are listed in `results/manual-controls.json`, with each failure or successful evaluation saved in its per-candidate `result.json`.
 
 After the build completes, run baseline and evaluator validation:
 
