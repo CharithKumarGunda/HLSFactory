@@ -6,10 +6,39 @@ const readJson = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url
 const readText = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const fail = (message) => { throw new Error(message); };
 const check = (condition, message) => { if (!condition) fail(message); };
+const sha256 = (value) => createHash('sha256').update(value).digest('hex');
+
+// Match evaluate.py's split_tests(): the recorded source hash covers the
+// implementation text after test functions have been removed.
+function implementationText(source) {
+  const normalized = source.replace(/\r\n/g, '\n');
+  const masked = normalized.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"/g,
+    (match) => ' '.repeat(match.length));
+  const spans = [];
+  const tests = /#\[test\]\s*fn\s+\w+\s*\(/g;
+  for (const match of masked.matchAll(tests)) {
+    const start = masked.indexOf('{', match.index + match[0].length);
+    check(start >= 0, 'Malformed DSLX test function');
+    let depth = 1;
+    let end = start + 1;
+    while (depth > 0 && end < masked.length) {
+      if (masked[end] === '{') depth++;
+      else if (masked[end] === '}') depth--;
+      end++;
+    }
+    check(depth === 0, 'Unclosed DSLX test function');
+    spans.push([match.index, end]);
+  }
+  let implementation = normalized;
+  for (const [start, end] of spans.reverse()) {
+    implementation = implementation.slice(0, start) + implementation.slice(end);
+  }
+  return implementation;
+}
 
 const provenance = readJson('./results/provenance.json');
 const source = readFileSync(new URL('./reference/idct_chen.x', import.meta.url));
-const sourceHash = createHash('sha256').update(source).digest('hex');
+const sourceHash = sha256(source);
 check(sourceHash === provenance.files_sha256['idct_chen.x'], 'Pinned IDCT source hash differs from provenance');
 check((source.toString('utf8').match(/#\[test\]/g) ?? []).length === 5, 'Expected five original DSLX tests');
 
@@ -36,6 +65,9 @@ check(validation.incorrect.correctness_status === 'rejected' && validation.incor
 check(manual.controls.length === 2, 'Expected exactly two manual controls');
 for (const control of manual.controls) {
   const recorded = readJson(`./${control.result}`);
+  const publishedImplementationHash = sha256(implementationText(readText(`./${control.source}`)));
+  check(publishedImplementationHash === control.source_sha256,
+        `Published manual DSLX source differs from evaluated implementation: ${control.id}`);
   check(recorded.source_sha256 === control.source_sha256, `Manual control hash differs: ${control.id}`);
   check(recorded.configuration_sha256 === manual.fixed_configuration_sha256,
         `Manual control configuration differs: ${control.id}`);
@@ -71,4 +103,3 @@ check(retryLog.includes('timed out') && retryLog.includes('did not propose a new
 
 console.log('Review artifacts agree: pinned source, five tests, evaluator controls, manual result, and bounded GEPA runs.');
 console.log('This checks saved records only; it does not rerun XLS or prove hardware performance.');
-

@@ -6,7 +6,7 @@ This experiment rewrites DSLX implementation source only. XLS scheduling and cod
 
 The XLS tools, evaluator, and original bounded local GEPA experiment are complete. On 2026-10-30 a separate manual positive control passed five protected tests, 527 differential inputs, and XLS equivalence checking. It kept the fixed unit-model objective at delay 40 while reducing the secondary ASAP7 estimate from 8488 to 8424 ps and optimized IR nodes from 1883 to 1820. See `STEFAN_REVIEW_GUIDE.md` for the review path, `REPORT.md` for outcomes, and `PROJECT_STATUS.md` for exact versions and next steps.
 
-Reviewers can check that the published source, configuration, validation record, manual controls, comparison table, and GEPA summaries agree by running `node verify_review.mjs`. This checks saved artifacts and requires no Docker or model. It does not rerun XLS.
+Reviewers can check that the published source, configuration, validation record, manual controls, comparison table, and GEPA summaries agree by running `node verify_review.mjs`. The checker recomputes implementation hashes from both published manual DSLX files and compares them with their recorded evaluations. This checks saved artifacts and requires no Docker or model. It does not rerun XLS.
 
 ## Environment
 
@@ -104,4 +104,3 @@ From Windows, `local-model-runner.ps1` performs the image/model availability che
 Run metadata, model usage, candidate lineage, reflection prompts/responses, best source and baseline-versus-best summary are saved under `results/gepa/<run-id>/`. Provider randomness means exact regenerated candidate text may vary even with the same seed. Preserved candidates can be reevaluated deterministically.
 
 Official sources consulted: [GEPA adapter guide](https://gepa-ai.github.io/gepa/guides/adapters/), [GEPA optimize API](https://gepa-ai.github.io/gepa/api/core/optimize/), and the XLS source at the pinned commit. This review branch includes the unit delay model file; the full XLS source and toolchain remain external dependencies.
-
