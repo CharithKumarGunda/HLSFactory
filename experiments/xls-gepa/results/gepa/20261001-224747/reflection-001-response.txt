@@ -1,0 +1,103 @@
+```dslx
+const COEFF_PER_MCU: u32 = 64;
+const COEFF_PER_MCU_U8: u8 = 64;
+
+const W1: s32 = s32:2841;    // 2048*sqrt(2)*cos(1*pi/16)
+const W2: s32 = s32:2676;    // 2048*sqrt(2)*cos(2*pi/16)
+const W3: s32 = s32:2408;    // 2048*sqrt(2)*cos(3*pi/16)
+const W5: s32 = s32:1609;    // 2048*sqrt(2)*cos(5*pi/16)
+const W6: s32 = s32:1108;    // 2048*sqrt(2)*cos(6*pi/16)
+const W7: s32 = s32:800;     // 2048*sqrt(2)*cos(7*pi/16)
+
+const R2: s32 = s32:128;
+
+fn idct_row(row: &mut [s32]) {
+    let mut y0 = 0;
+    let mut y1 = 0;
+    let mut y2 = 0;
+    let mut y3 = 0;
+    let mut y4 = 0;
+    let mut y5 = 0;
+    let mut y6 = 0;
+    let mut y7 = 0;
+
+    for i in 0..8 {
+        let y8 = W7 * (row[i * 8 + 4] + row[i * 8 + 5]) + s32:4;
+        y4 = (y8 + row[i * 8 + 0] * W1) >> 3;
+        y5 = (y8 - row[i * 8 + 1] * W1) >> 3;
+        y6 = (y8 - row[i * 8 + 2] * W1) >> 3;
+        y7 = (y8 - row[i * 8 + 3] * W1) >> 3;
+
+        y0 = row[i * 8 + 0] + row[i * 8 + 7];
+        y1 = row[i * 8 + 7] + row[i * 8 + 6];
+        y2 = row[i * 8 + 6] + row[i * 8 + 5];
+        y3 = row[i * 8 + 5] + row[i * 8 + 4];
+        y4 = (y4 + row[i * 8 + 2] * W2) >> 3;
+        y5 = (y5 + row[i * 8 + 3] * W2) >> 3;
+        y6 = (y6 + row[i * 8 + 1] * W2) >> 3;
+        y7 = (y7 + row[i * 8 + 0] * W2) >> 3;
+
+        row[i * 8 + 0] = (y0 + y2) + (y4 + y6) >> 4;
+        row[i * 8 + 1] = (y1 + y3) + (y4 + y7) >> 4;
+        row[i * 8 + 2] = (y0 + y3) + (y5 + y6) >> 4;
+        row[i * 8 + 3] = (y1 + y2) + (y5 + y7) >> 4;
+        row[i * 8 + 4] = (y0 + y5) + (y6 + y7) >> 4;
+        row[i * 8 + 5] = (y1 + y4) + (y6 + y7) >> 4;
+        row[i * 8 + 6] = (y0 + y4) + (y5 + y6) >> 4;
+        row[i * 8 + 7] = (y1 + y3) + (y5 + y6) >> 4;
+    }
+}
+
+fn idct_col(col: &mut [s32]) {
+    let mut y0 = 0;
+    let mut y1 = 0;
+    let mut y2 = 0;
+    let mut y3 = 0;
+    let mut y4 = 0;
+    let mut y5 = 0;
+    let mut y6 = 0;
+    let mut y7 = 0;
+
+    for i in 0..8 {
+        let y8 = W7 * (col[i * 8 + 4] + col[i * 8 + 5]) + s32:4;
+        y4 = (y8 + col[i * 8 + 0] * W1) >> 3;
+        y5 = (y8 - col[i * 8 + 1] * W1) >> 3;
+        y6 = (y8 - col[i * 8 + 2] * W1) >> 3;
+        y7 = (y8 - col[i * 8 + 3] * W1) >> 3;
+
+        y0 = col[i * 8 + 0] + col[i * 8 + 7];
+        y1 = col[i * 8 + 7] + col[i * 8 + 6];
+        y2 = col[i * 8 + 6] + col[i * 8 + 5];
+        y3 = col[i * 8 + 5] + col[i * 8 + 4];
+        y4 = (y4 + col[i * 8 + 2] * W2) >> 3;
+        y5 = (y5 + col[i * 8 + 3] * W2) >> 3;
+        y6 = (y6 + col[i * 8 + 1] * W2) >> 3;
+        y7 = (y7 + col[i * 8 + 0] * W2) >> 3;
+
+        col[i * 8 + 0] = (y0 + y2) + (y4 + y6) >> 4;
+        col[i * 8 + 1] = (y1 + y3) + (y4 + y7) >> 4;
+        col[i * 8 + 2] = (y0 + y3) + (y5 + y6) >> 4;
+        col[i * 8 + 3] = (y1 + y2) + (y5 + y7) >> 4;
+        col[i * 8 + 4] = (y0 + y5) + (y6 + y7) >> 4;
+        col[i * 8 + 5] = (y1 + y4) + (y6 + y7) >> 4;
+        col[i * 8 + 6] = (y0 + y4) + (y5 + y6) >> 4;
+        col[i * 8 + 7] = (y1 + y3) + (y5 + y6) >> 4;
+    }
+}
+
+fn idct(f: &mut [s32]) {
+    for row in f.chunks_mut(8) {
+        idct_row(row);
+    }
+
+    for col in f.chunks_mut(COEFF_PER_MCU_U8) {
+        idct_col(col);
+    }
+}
+
+pub fn idct(f: s32[COEFF_PER_MCU]) -> s32[COEFF_PER_MCU] {
+    let mut f = f;
+    idct(&mut f);
+    f
+}
+```
